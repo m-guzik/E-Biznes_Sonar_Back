@@ -50,7 +50,10 @@ type CartController struct {
 
 func (paymentController *PaymentController) makePayment(c echo.Context) error {
     var payment Payment
-    c.Bind(&payment)
+    err := c.Bind(&payment)
+    if err != nil {
+        panic("Failed to make a payment")
+    }
     paymentController.db.Create(&payment)
     return c.JSON(201, payment)
 }
@@ -71,7 +74,10 @@ func (paymentController *PaymentController) deletePayment(c echo.Context) error 
 
 func (productController *ProductController) addProduct(c echo.Context) error {
     var product Product
-    c.Bind(&product)
+    err := c.Bind(&product)
+    if err != nil {
+        panic("Failed to add a product")
+    }
     productController.db.Create(&product)
     return c.JSON(201, product)
 }
@@ -114,7 +120,10 @@ func (cartController *CartController) addToCart(c echo.Context) error {
 		ProductName string `json:"Name"`
 		ProductPrice uint `json:"Price"`
 	}
-	c.Bind(&request);
+	err := c.Bind(&request)
+    if err != nil {
+        panic("Failed to add a product to the cart")
+    }
 
     cartController.db.Find(&cartItem, CartItem{ProductId: request.ProductID})
     currentAmount := cartItem.Amount
@@ -135,7 +144,10 @@ func (cartController *CartController) addToCart(c echo.Context) error {
 
 func (cartController *CartController) totalCartValue(c echo.Context) error {
     var sum int
-    cartController.db.Table("cart_items").Select("sum(price*amount)").Row().Scan(&sum)
+    err := cartController.db.Table("cart_items").Select("sum(price*amount)").Row().Scan(&sum)
+    if err != nil {
+        panic("Failed to get a total cart value")
+    }
     return c.JSON(200, sum)
 }
 
@@ -154,6 +166,7 @@ func (cartController *CartController) deleteFromCart(c echo.Context) error {
 
 
 func main() {
+    const dbError = "Database error"
     db, err := gorm.Open(sqlite.Open("products.db"), &gorm.Config{})
     if err != nil {
         panic("Failed to connect database")
@@ -161,15 +174,15 @@ func main() {
 
     errProduct := db.AutoMigrate(&Product{})
     if errProduct != nil {
-        panic("Database error")
+        panic(dbError)
     }
     errPayment := db.AutoMigrate(&Payment{})
     if errPayment != nil {
-        panic("Database error")
+        panic(dbError)
     }
     errCartItem := db.AutoMigrate(&CartItem{})
     if errCartItem != nil {
-        panic("Database error")
+        panic(dbError)
     }
 
     productController := &ProductController{db : db}
