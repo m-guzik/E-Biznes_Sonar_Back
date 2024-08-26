@@ -159,9 +159,18 @@ func main() {
         panic("Failed to connect database")
     }
 
-    db.AutoMigrate(&Product{})
-    db.AutoMigrate(&Payment{})
-    db.AutoMigrate(&CartItem{})
+    errProduct := db.AutoMigrate(&Product{})
+    if errProduct != nil {
+        panic("Database error")
+    }
+    errPayment := db.AutoMigrate(&Payment{})
+    if errPayment != nil {
+        panic("Database error")
+    }
+    errCartItem := db.AutoMigrate(&CartItem{})
+    if errCartItem != nil {
+        panic("Database error")
+    }
 
     productController := &ProductController{db : db}
     paymentController := &PaymentController{db : db}
