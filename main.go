@@ -167,6 +167,7 @@ func (cartController *CartController) deleteFromCart(c echo.Context) error {
 
 func main() {
     const dbError = "Database error"
+    
     db, err := gorm.Open(sqlite.Open("products.db"), &gorm.Config{})
     if err != nil {
         panic("Failed to connect database")
