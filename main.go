@@ -199,7 +199,7 @@ func main() {
     }))
 
 	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello and welcome to my Bike Shop!")
+		return c.String(http.StatusOK, "Hello and welcome to my Bike Shop! (v 0.1)")
 	})
 
 	e.POST("addProduct", productController.addProduct)
